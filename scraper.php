@@ -28,13 +28,13 @@ class Scraper {
 	}
 
 	/**
-	 * all() - enables all pattern matching
+	 * matchAll() - enables all pattern matching
 	 *
 	 * @param boolean - optional; defaults to true
 	 *
 	 * @return $this
 	 */
-	public function all($enable = true) {
+	public function matchAll($enable = true) {
 		$this->all = $enable;
 		return $this;
 	}
@@ -91,8 +91,6 @@ class Scraper {
 
 			if (is_string($key)) {
                 $matches = $this->formatMatches($key, $matches);
-				//$matches = array($key => $matches);
-                
 			}
 
 			$results = array_merge($results, $matches);
