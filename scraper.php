@@ -39,6 +39,16 @@ class Scraper {
 		return $this;
 	}
 
+    /**
+     * setPatterns() - set regex patterns
+     *
+     * @param array - array of regex patterns
+     */
+    public function setPatterns($patterns) {
+        $this->patterns = $patterns;
+        return $this;
+    }
+
 	/**
 	 * addPattern() - add regex pattern
 	 *
