@@ -140,7 +140,8 @@ class Scraper {
             }
         }
 
-        return array($results);
+        // if we have sub-keys, put the whole thing into an array
+        return (count($key_parts) > 1 ? array($results) : $results);
     }
 
 	/**
@@ -149,6 +150,10 @@ class Scraper {
 	 * @return array - the cleaned results
 	 */
 	public function clean($results) {
+        // squash the results for a single pattern
+        if (count($this->patterns) == 1 && count($results) == 1) {
+            $results = current($results);
+        }
 		return $results;
 	}
 
