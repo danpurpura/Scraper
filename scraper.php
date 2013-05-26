@@ -43,13 +43,14 @@ class Scraper {
 	 * addPattern() - add regex pattern
 	 *
 	 * @param string - regex pattern
-	 * @param string - optional; name of pattern
+	 * @param string - optional; name of pattern;
+     *                 can contain subkeys (comma separated i.e. 'one,two,three')
 	 *
 	 * @return $this
 	 */
-	public function addPattern($aString, $name = null) {
-        if (isset($name)) {
-            $this->patterns[$name] = $aString;
+	public function addPattern($aString, $key = null) {
+        if (isset($key)) {
+            $this->patterns[$key] = $aString;
         } else {
             $this->patterns[] = $aString;
         }
@@ -79,24 +80,60 @@ class Scraper {
 
 	/**
 	 * process() - applies to the patterns to the data
-	 *
-	 * @return array - merged results (matches); auto cleaned
+     *
+	 * @return array - results (matches); auto cleaned
 	 */
 	public function process() {
 		$data = $this->getData();
 		$results = array();
 		foreach((array)$this->patterns as $key => $pattern) {
 			$matches = $this->match($pattern, $data);
-			
+
 			if (is_string($key)) {
-				$matches = array($key => $matches);
+                $matches = $this->formatMatches($key, $matches);
+				//$matches = array($key => $matches);
+                
 			}
-			
+
 			$results = array_merge($results, $matches);
 
 		}
 		return $this->clean($results);
 	}
+
+	/**
+	 * formatMatches() - format the given key and matches
+     *
+     * - default use is, array(key => captured pattern)
+     * - if key contains sub keys, returns:
+     *    array(sub key 1 => captured pattern 1, ..., sub key n => captured pattern n)
+	 *
+	 * @return array - results
+	 */
+    public function formatMatches($key, $matches) {
+        // split our key into parts
+        $key_parts = explode(',', $key);
+
+        // if we have no matches, return null for the key
+        if (empty($matches)) {
+            return array($key => null);
+        }
+
+        $results = array();
+
+        // loop over, and build our results array
+        foreach($key_parts as $key_index => $sub_key) {
+            if (!$this->all) {
+                $results[$sub_key] = $matches[$key_index + 1];
+            } else {
+                for($i = 0; $i < count($matches[0]); $i++) {
+                    $results[$i][$sub_key] = $matches[$key_index + 1][$i];
+                }
+            }
+        }
+
+        return array($results);
+    }
 
 	/**
 	 * clean() - called after processing; override to perform custom formatting
